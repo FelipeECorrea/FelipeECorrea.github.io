@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Felipe Evanilson Corrêa — Analista de Dados & Automação</title>
+<meta name="description" content="Da disciplina do Exército à precisão dos dados. Dashboards, modelagem e automação com Power BI, SQL e Python.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%93%8A%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300..800&family=Instrument+Sans:ital,wght@0,400..600;1,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#08090F;
+  --bg-2:#0B0D18;
+  --surface:rgba(255,255,255,.035);
+  --surface-2:rgba(255,255,255,.06);
+  --brd:rgba(255,255,255,.09);
+  --brd-strong:rgba(255,255,255,.16);
+  --text:#EDEFF7;
+  --muted:#9AA0B8;
+  --faint:#61667E;
+  --a1:#22D3EE;   /* cyan  */
+  --a2:#8B5CF6;   /* violet*/
+  --a3:#F472B6;   /* pink  */
+  --a4:#FBBF24;   /* amber */
+  --a5:#3B82F6;   /* blue  */
+  --grad:linear-gradient(100deg,var(--a1),var(--a2) 55%,var(--a3));
+  --ring:0 0 0 1px var(--brd);
+  --maxw:1080px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;background:var(--bg);color:var(--text);
+  font-family:"Instrument Sans",system-ui,sans-serif;
+  font-size:17px;line-height:1.6;letter-spacing:-.01em;
+  -webkit-font-smoothing:antialiased;overflow-x:hidden;
+}
+a{color:inherit;text-decoration:none}
+img{max-width:100%;display:block}
+::selection{background:rgba(139,92,246,.4)}
+
+/* ---------- Aurora background (the color anomalies) ---------- */
+.aurora{position:fixed;inset:0;z-index:-2;overflow:hidden;background:
+  radial-gradient(120% 90% at 80% -10%, #12142a 0%, transparent 55%),
+  radial-gradient(90% 70% at -10% 110%, #0e1024 0%, transparent 60%),
+  var(--bg);}
+.blob{position:absolute;border-radius:50%;filter:blur(70px);opacity:.55;
+  mix-blend-mode:screen;will-change:transform;}
+.b1{width:44vw;height:44vw;background:radial-gradient(circle,var(--a2),transparent 65%);top:-8%;left:8%;animation:drift1 26s ease-in-out infinite alternate;}
+.b2{width:38vw;height:38vw;background:radial-gradient(circle,var(--a1),transparent 65%);top:18%;right:2%;animation:drift2 30s ease-in-out infinite alternate;}
+.b3{width:40vw;height:40vw;background:radial-gradient(circle,var(--a3),transparent 65%);bottom:-6%;left:24%;animation:drift3 34s ease-in-out infinite alternate;}
+.b4{width:26vw;height:26vw;background:radial-gradient(circle,var(--a4),transparent 60%);bottom:14%;right:16%;opacity:.35;animation:drift1 38s ease-in-out infinite alternate-reverse;}
+.b5{width:30vw;height:30vw;background:radial-gradient(circle,var(--a5),transparent 65%);top:44%;left:-6%;animation:drift2 32s ease-in-out infinite alternate-reverse;}
+@keyframes drift1{to{transform:translate(6vw,7vh) scale(1.15)}}
+@keyframes drift2{to{transform:translate(-7vw,5vh) scale(.9)}}
+@keyframes drift3{to{transform:translate(5vw,-6vh) scale(1.1)}}
+.grain{position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.05;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");}
+
+/* ---------- Layout ---------- */
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px}
+.section{padding:96px 0;position:relative}
+.eyebrow{font-family:"JetBrains Mono",monospace;font-size:12.5px;letter-spacing:.18em;
+  text-transform:uppercase;color:var(--a1);display:inline-flex;align-items:center;gap:9px}
+.eyebrow::before{content:"";width:26px;height:1px;background:linear-gradient(90deg,var(--a1),transparent)}
+h2.title{font-family:"Bricolage Grotesque",sans-serif;font-weight:600;
+  font-size:clamp(28px,4.6vw,44px);line-height:1.05;letter-spacing:-.03em;margin:16px 0 0}
+
+/* ---------- Nav ---------- */
+.nav{position:fixed;top:0;left:0;right:0;z-index:40;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:16px 24px;backdrop-filter:blur(12px);
+  background:linear-gradient(180deg,rgba(8,9,15,.72),rgba(8,9,15,0));
+  transition:background .3s,box-shadow .3s}
+.nav.scrolled{background:rgba(8,9,15,.82);box-shadow:0 1px 0 var(--brd)}
+.brand{display:flex;align-items:center;gap:11px;font-family:"Bricolage Grotesque";font-weight:600;letter-spacing:-.02em}
+.brand .dot{width:30px;height:30px;border-radius:9px;background:var(--grad);
+  display:grid;place-items:center;font-size:13px;color:#0a0a12;font-weight:700;
+  box-shadow:0 0 22px rgba(139,92,246,.5)}
+.nav-links{display:flex;align-items:center;gap:26px}
+.nav-links a{font-size:14.5px;color:var(--muted);transition:color .2s;position:relative}
+.nav-links a:hover{color:var(--text)}
+.nav-links a::after{content:"";position:absolute;left:0;bottom:-5px;height:1px;width:0;background:var(--a1);transition:width .25s}
+.nav-links a:hover::after{width:100%}
+.lang{display:inline-flex;border:1px solid var(--brd);border-radius:999px;overflow:hidden;font-family:"JetBrains Mono";font-size:12px}
+.lang button{background:none;border:0;color:var(--muted);padding:6px 11px;cursor:pointer;transition:.2s;letter-spacing:.05em}
+.lang button.on{background:var(--surface-2);color:var(--text)}
+
+/* ---------- Hero ---------- */
+.hero{min-height:100vh;display:grid;align-items:center;padding-top:90px;padding-bottom:60px}
+.hero-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:56px;align-items:center}
+.hi{font-family:"JetBrains Mono";font-size:14px;color:var(--muted);display:flex;align-items:center;gap:10px;margin-bottom:22px}
+.wave{display:inline-block;transform-origin:70% 70%;animation:wave 2.6s ease-in-out infinite}
+@keyframes wave{0%,60%,100%{transform:rotate(0)}10%{transform:rotate(16deg)}20%{transform:rotate(-10deg)}30%{transform:rotate(16deg)}40%{transform:rotate(-6deg)}50%{transform:rotate(12deg)}}
+h1{font-family:"Bricolage Grotesque",sans-serif;font-weight:700;
+  font-size:clamp(40px,7vw,74px);line-height:.98;letter-spacing:-.045em;margin:0}
+h1 .grad{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.role{font-family:"JetBrains Mono";font-size:clamp(14px,1.7vw,16px);color:var(--a1);
+  margin-top:22px;letter-spacing:.04em}
+.role .sep{color:var(--faint);margin:0 8px}
+.lead{color:var(--muted);font-size:clamp(16px,1.9vw,19px);margin-top:22px;max-width:30em}
+.loc{display:inline-flex;align-items:center;gap:8px;margin-top:20px;
+  font-family:"JetBrains Mono";font-size:12.5px;color:var(--faint);letter-spacing:.05em}
+.loc .pin{width:6px;height:6px;border-radius:50%;background:var(--a4);box-shadow:0 0 10px var(--a4)}
+.cta-row{display:flex;flex-wrap:wrap;gap:12px;margin-top:34px}
+.btn{display:inline-flex;align-items:center;gap:9px;padding:13px 20px;border-radius:12px;
+  font-size:14.5px;font-weight:500;cursor:pointer;transition:transform .18s,box-shadow .25s,background .25s;border:1px solid transparent}
+.btn:hover{transform:translateY(-2px)}
+.btn-primary{background:var(--grad);color:#08090f;font-weight:600;box-shadow:0 8px 30px rgba(124,58,237,.35)}
+.btn-primary:hover{box-shadow:0 12px 38px rgba(124,58,237,.5)}
+.btn-ghost{background:var(--surface);border-color:var(--brd);color:var(--text)}
+.btn-ghost:hover{border-color:var(--brd-strong);background:var(--surface-2)}
+.btn svg{width:17px;height:17px}
+
+/* ---------- Avatar signature (portrait data node) ---------- */
+.avatar-stage{position:relative;width:min(370px,85vw);margin:0 auto;perspective:1100px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.avatar-card{position:relative;aspect-ratio:4/5;border-radius:26px;
+  transform-style:preserve-3d;transition:transform .25s ease-out;will-change:transform}
+.avatar-card::before{content:"";position:absolute;inset:-3px;border-radius:29px;z-index:-1;
+  background:conic-gradient(from 0deg,var(--a1),var(--a2),var(--a3),var(--a4),var(--a5),var(--a1));
+  filter:blur(16px);opacity:.55;animation:spin 9s linear infinite}
+.avatar-inner{position:absolute;inset:0;border-radius:26px;overflow:hidden;
+  border:1px solid var(--brd-strong);transform:translateZ(34px);
+  background:linear-gradient(150deg,#171a2e,#0d0f1c);
+  box-shadow:0 40px 84px -26px rgba(0,0,0,.85),0 0 0 1px rgba(255,255,255,.04) inset}
+.avatar-photo{width:100%;height:100%;object-fit:cover;object-position:50% 18%;display:none}
+.has-photo .avatar-photo{display:block}
+.has-photo .avatar-mono{display:none}
+.avatar-mono{position:absolute;inset:0;display:grid;place-items:center;
+  font-family:"Bricolage Grotesque";font-weight:700;font-size:clamp(70px,20vw,120px);
+  letter-spacing:-.05em;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.avatar-veil{position:absolute;inset:0;pointer-events:none;transition:opacity .45s;
+  background:linear-gradient(180deg,rgba(8,9,15,.28),transparent 30%,transparent 60%,rgba(8,9,15,.5))}
+.avatar-card:hover .avatar-veil{opacity:.3}
+.avatar-scan{position:absolute;left:0;right:0;height:28%;pointer-events:none;
+  background:linear-gradient(180deg,transparent,rgba(34,211,238,.16),transparent);
+  animation:scan 4.2s ease-in-out infinite}
+@keyframes scan{0%,100%{transform:translateY(-40%);opacity:0}50%{transform:translateY(300%);opacity:1}}
+.avatar-glare{position:absolute;inset:0;pointer-events:none;opacity:0;transition:opacity .3s;
+  background:radial-gradient(260px circle at var(--gx,50%) var(--gy,0%),rgba(255,255,255,.18),transparent 45%)}
+.avatar-card:hover .avatar-glare{opacity:1}
+.corner{position:absolute;width:26px;height:26px;border:2px solid var(--a1);opacity:.75;z-index:2}
+.corner.tl{top:13px;left:13px;border-right:0;border-bottom:0;border-radius:7px 0 0 0}
+.corner.br{bottom:13px;right:13px;border-left:0;border-top:0;border-radius:0 0 7px 0}
+.code-badge{position:absolute;top:14px;right:14px;z-index:2;font-family:"JetBrains Mono";
+  font-size:13px;color:var(--a1);background:rgba(8,9,15,.55);border:1px solid var(--brd);
+  border-radius:8px;padding:3px 8px;backdrop-filter:blur(6px)}
+.chip{position:absolute;font-family:"JetBrains Mono";font-size:12px;padding:7px 12px;border-radius:999px;
+  background:rgba(12,14,24,.72);border:1px solid var(--brd);color:var(--text);backdrop-filter:blur(6px);
+  white-space:nowrap;box-shadow:0 6px 20px rgba(0,0,0,.4);animation:bob 5s ease-in-out infinite}
+.chip i{display:inline-block;width:6px;height:6px;border-radius:50%;margin-right:7px;vertical-align:middle}
+.chip.c1{top:2%;left:-10%;animation-delay:0s}
+.chip.c2{top:38%;right:-16%;animation-delay:1.2s}
+.chip.c3{bottom:4%;left:-6%;animation-delay:.6s}
+.chip.c4{bottom:26%;right:-12%;animation-delay:1.8s}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}
+.status{position:absolute;bottom:-30px;left:50%;transform:translateX(-50%);
+  font-family:"JetBrains Mono";font-size:11.5px;color:#7CF5C4;letter-spacing:.08em;
+  display:flex;align-items:center;gap:7px}
+.status .live{width:7px;height:7px;border-radius:50%;background:#34D399;box-shadow:0 0 10px #34D399;animation:pulse 1.8s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* ---------- About ---------- */
+.about-grid{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:start;margin-top:34px}
+.about-lead{font-family:"Bricolage Grotesque";font-weight:400;font-size:clamp(20px,2.6vw,27px);
+  line-height:1.35;letter-spacing:-.02em}
+.about-lead b{font-weight:600;color:var(--text)}
+.about-body p{color:var(--muted);margin:0 0 16px}
+.stats{display:flex;gap:14px;flex-wrap:wrap;margin-top:26px}
+.stat{flex:1;min-width:130px;padding:18px;border-radius:14px;background:var(--surface);border:1px solid var(--brd)}
+.stat .n{font-family:"Bricolage Grotesque";font-weight:700;font-size:30px;
+  background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.stat .l{font-family:"JetBrains Mono";font-size:11.5px;color:var(--muted);letter-spacing:.04em;margin-top:4px}
+
+/* ---------- Expertise ---------- */
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:40px}
+.card{padding:26px;border-radius:18px;background:var(--surface);border:1px solid var(--brd);
+  position:relative;overflow:hidden;transition:transform .25s,border-color .25s,background .25s}
+.card::before{content:"";position:absolute;inset:0;opacity:0;transition:opacity .3s;
+  background:radial-gradient(500px circle at var(--mx,50%) var(--my,50%),rgba(139,92,246,.14),transparent 40%)}
+.card:hover{transform:translateY(-4px);border-color:var(--brd-strong);background:var(--surface-2)}
+.card:hover::before{opacity:1}
+.card .ico{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;
+  font-size:20px;margin-bottom:16px;border:1px solid var(--brd)}
+.card h3{font-family:"Bricolage Grotesque";font-weight:600;font-size:19px;margin:0 0 8px;letter-spacing:-.02em}
+.card p{color:var(--muted);font-size:15px;margin:0}
+.card .tag{position:absolute;top:20px;right:20px;font-family:"JetBrains Mono";font-size:11px;color:var(--faint)}
+
+/* ---------- Experience timeline ---------- */
+.timeline{margin-top:44px;position:relative;padding-left:4px}
+.tl-item{display:grid;grid-template-columns:120px 1fr;gap:28px;padding:0 0 40px 0;position:relative}
+.tl-item::before{content:"";position:absolute;left:143px;top:8px;bottom:-8px;width:1px;background:linear-gradient(180deg,var(--brd-strong),transparent)}
+.tl-item:last-child::before{display:none}
+.tl-year{font-family:"JetBrains Mono";font-size:13.5px;color:var(--a1);text-align:right;padding-top:2px}
+.tl-body{position:relative;padding-left:34px}
+.tl-body::before{content:"";position:absolute;left:-4px;top:6px;width:11px;height:11px;border-radius:50%;
+  background:var(--bg);border:2px solid var(--a2);box-shadow:0 0 0 4px rgba(139,92,246,.12)}
+.tl-body h3{font-family:"Bricolage Grotesque";font-weight:600;font-size:20px;margin:0;letter-spacing:-.02em}
+.tl-body .org{color:var(--a3);font-size:14.5px;margin:3px 0 10px;font-family:"JetBrains Mono"}
+.tl-body p{color:var(--muted);font-size:15px;margin:0}
+.tl-body .medal{display:inline-block;margin-top:10px;font-size:12.5px;font-family:"JetBrains Mono";
+  color:var(--a4);border:1px solid rgba(251,191,36,.3);border-radius:999px;padding:4px 11px}
+
+/* ---------- Projects ---------- */
+.proj{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:40px}
+.pcard{padding:24px;border-radius:18px;background:var(--surface);border:1px solid var(--brd);
+  transition:transform .25s,border-color .25s;display:flex;flex-direction:column;gap:10px}
+.pcard:hover{transform:translateY(-4px);border-color:var(--brd-strong)}
+.pcard .pt{font-family:"JetBrains Mono";font-size:11.5px;color:var(--faint);letter-spacing:.08em;text-transform:uppercase}
+.pcard h3{font-family:"Bricolage Grotesque";font-weight:600;font-size:20px;margin:0;letter-spacing:-.02em}
+.pcard p{color:var(--muted);font-size:14.5px;margin:0;flex:1}
+.pcard .stack{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.pcard .stack span{font-family:"JetBrains Mono";font-size:11px;color:var(--muted);
+  background:var(--surface-2);border:1px solid var(--brd);border-radius:6px;padding:3px 8px}
+
+/* ---------- Contact / footer ---------- */
+.contact{text-align:center;padding:110px 0 90px}
+.contact h2{font-family:"Bricolage Grotesque";font-weight:700;font-size:clamp(32px,5.6vw,58px);
+  line-height:1.02;letter-spacing:-.04em;margin:14px auto 0;max-width:14em}
+.contact h2 .grad{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.contact p{color:var(--muted);max-width:30em;margin:20px auto 0}
+.contact .cta-row{justify-content:center}
+.foot{border-top:1px solid var(--brd);margin-top:80px;padding:28px 0;
+  display:flex;justify-content:space-between;flex-wrap:wrap;gap:14px;
+  font-family:"JetBrains Mono";font-size:12.5px;color:var(--faint)}
+.foot a{color:var(--muted)}
+.foot a:hover{color:var(--text)}
+
+/* ---------- Reveal ---------- */
+.reveal{opacity:0;transform:translateY(24px);transition:opacity .7s cubic-bezier(.2,.7,.2,1),transform .7s cubic-bezier(.2,.7,.2,1)}
+.reveal.in{opacity:1;transform:none}
+
+/* ---------- Responsive ---------- */
+@media(max-width:860px){
+  .nav-links{display:none}
+  .hero-grid{grid-template-columns:1fr;gap:44px;text-align:center}
+  .hi,.role,.loc{justify-content:center}
+  .lead{margin-left:auto;margin-right:auto}
+  .cta-row{justify-content:center}
+  .avatar-stage{order:-1}
+  .about-grid{grid-template-columns:1fr;gap:26px}
+  .cards,.proj{grid-template-columns:1fr 1fr}
+}
+@media(max-width:560px){
+  .section{padding:74px 0}
+  .cards,.proj{grid-template-columns:1fr}
+  .tl-item{grid-template-columns:64px 1fr;gap:16px}
+  .tl-item::before{left:79px}
+  .tl-body{padding-left:26px}
+  .chip.c2,.chip.c4{right:-6%}
+}
+@media(prefers-reduced-motion:reduce){
+  *{animation:none!important}
+  html{scroll-behavior:auto}
+  .reveal{opacity:1;transform:none;transition:none}
+}
+</style>
+</head>
+<body>
+
+<div class="aurora" aria-hidden="true">
+  <div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div>
+  <div class="blob b4"></div><div class="blob b5"></div>
+</div>
+<div class="grain" aria-hidden="true"></div>
+
+<!-- NAV -->
+<nav class="nav" id="nav">
+  <a class="brand" href="#top"><span class="dot">FC</span><span>Felipe Corrêa</span></a>
+  <div class="nav-links">
+    <a href="#sobre" class="i18n" data-pt="Sobre" data-en="About">Sobre</a>
+    <a href="#especialidade" class="i18n" data-pt="Especialidade" data-en="Expertise">Especialidade</a>
+    <a href="#experiencia" class="i18n" data-pt="Experiência" data-en="Experience">Experiência</a>
+    <a href="#projetos" class="i18n" data-pt="Projetos" data-en="Projects">Projetos</a>
+    <a href="#contato" class="i18n" data-pt="Contato" data-en="Contact">Contato</a>
+  </div>
+  <div class="lang" role="group" aria-label="Idioma / Language">
+    <button data-lang="pt" class="on">PT</button>
+    <button data-lang="en">EN</button>
+  </div>
+</nav>
+
+<main id="top">
+<!-- HERO -->
+<section class="hero wrap">
+  <div class="hero-grid">
+    <div>
+      <div class="hi"><span class="wave">👋</span>
+        <span class="i18n" data-pt="Olá, prazer — eu sou o" data-en="Hey there — I'm">Olá, prazer — eu sou o</span></div>
+      <h1>Felipe<br><span class="grad">Evanilson Corrêa</span></h1>
+      <div class="role">
+        <span class="i18n" data-pt="Analista de Dados" data-en="Data Analyst">Analista de Dados</span>
+        <span class="sep">/</span>
+        <span class="i18n" data-pt="Automação" data-en="Automation">Automação</span>
+        <span class="sep">/</span>
+        <span class="i18n" data-pt="BI" data-en="BI">BI</span>
+      </div>
+      <p class="lead i18n"
+         data-pt="Transformo dados em decisão e processos repetitivos em automação. Da disciplina do Exército à precisão de um dashboard bem modelado."
+         data-en="I turn data into decisions and repetitive processes into automation — carrying military discipline into every well-modeled dashboard.">
+         Transformo dados em decisão e processos repetitivos em automação. Da disciplina do Exército à precisão de um dashboard bem modelado.</p>
+      <div class="loc"><span class="pin"></span>
+        <span class="i18n" data-pt="Blumenau · Santa Catarina · Brasil" data-en="Blumenau · Santa Catarina · Brazil">Blumenau · Santa Catarina · Brasil</span></div>
+      <div class="cta-row">
+        <a class="btn btn-primary" href="https://github.com/FelipeECorrea" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5a11.5 11.5 0 0 0-3.64 22.42c.58.1.79-.25.79-.56v-2c-3.2.7-3.88-1.36-3.88-1.36-.53-1.34-1.3-1.7-1.3-1.7-1.06-.72.08-.71.08-.71 1.17.08 1.79 1.2 1.79 1.2 1.04 1.78 2.73 1.27 3.4.97.1-.75.4-1.27.73-1.56-2.56-.29-5.26-1.28-5.26-5.7 0-1.26.45-2.29 1.19-3.1-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11 11 0 0 1 5.8 0c2.2-1.5 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.84 1.19 3.1 0 4.43-2.7 5.4-5.28 5.69.42.36.79 1.06.79 2.14v3.17c0 .31.21.67.8.56A11.5 11.5 0 0 0 12 .5Z"/></svg>
+          <span class="i18n" data-pt="Ver no GitHub" data-en="View on GitHub">Ver no GitHub</span>
+        </a>
+        <a class="btn btn-ghost" href="https://www.linkedin.com/in/felipeecorrea/" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.45 20.45h-3.56v-5.57c0-1.33-.02-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.35V9h3.42v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28ZM5.34 7.43a2.06 2.06 0 1 1 0-4.13 2.06 2.06 0 0 1 0 4.13ZM7.12 20.45H3.56V9h3.56v11.45ZM22.22 0H1.77C.8 0 0 .78 0 1.75v20.5C0 23.2.8 24 1.77 24h20.45c.98 0 1.78-.8 1.78-1.75V1.75C24 .78 23.2 0 22.22 0Z"/></svg>
+          LinkedIn
+        </a>
+        <a class="btn btn-ghost" href="mailto:pessoal.fec@gmail.com">
+          <span class="i18n" data-pt="Fale comigo" data-en="Get in touch">Fale comigo</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- SIGNATURE: portrait as a data node -->
+    <div class="avatar-stage" id="avatarStage">
+      <div class="avatar-card" id="avatarCard">
+        <div class="avatar-inner" id="avatarInner">
+          <img class="avatar-photo" src="foto.jpg" alt="Foto de Felipe Corrêa" id="avatarPhoto">
+          <div class="avatar-mono">FC</div>
+          <div class="avatar-veil"></div>
+          <div class="avatar-scan"></div>
+          <div class="avatar-glare" id="glare"></div>
+          <span class="corner tl"></span>
+          <span class="corner br"></span>
+          <span class="code-badge">&lt;/&gt;</span>
+        </div>
+      </div>
+      <span class="chip c1"><i style="background:var(--a4)"></i>Power BI</span>
+      <span class="chip c2"><i style="background:var(--a1)"></i>SQL</span>
+      <span class="chip c3"><i style="background:var(--a5)"></i>Python</span>
+      <span class="chip c4"><i style="background:var(--a3)"></i>Excel</span>
+      <span class="status"><span class="live"></span><span class="i18n" data-pt="disponível" data-en="available">disponível</span></span>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section class="section wrap reveal" id="sobre">
+  <span class="eyebrow i18n" data-pt="01 — Sobre" data-en="01 — About">01 — Sobre</span>
+  <h2 class="title i18n" data-pt="Disciplina que virou método." data-en="Discipline that became method.">Disciplina que virou método.</h2>
+  <div class="about-grid">
+    <p class="about-lead i18n"
+       data-pt="Passei anos no Exército aprendendo que <b>ordem e consistência resolvem problemas</b>. Hoje aplico o mesmo rigor aos dados: bases limpas, modelos claros e decisões apoiadas em número."
+       data-en="I spent years in the Army learning that <b>order and consistency solve problems</b>. Today I bring that same rigor to data: clean sources, clear models and decisions backed by numbers.">
+       Passei anos no Exército aprendendo que <b>ordem e consistência resolvem problemas</b>. Hoje aplico o mesmo rigor aos dados: bases limpas, modelos claros e decisões apoiadas em número.</p>
+    <div class="about-body">
+      <p class="i18n"
+         data-pt="Sou Analista Administrativo na Dental Fênix, atuando entre compras, comercial e logística — sempre com foco em análise de dados. Meu trabalho é tirar a informação da planilha esquecida e colocá-la onde ela decide."
+         data-en="I'm an Administrative Analyst at Dental Fênix, working across purchasing, sales and logistics — always with a focus on data analysis. My job is to pull information out of the forgotten spreadsheet and put it where decisions are made.">
+         Sou Analista Administrativo na Dental Fênix, atuando entre compras, comercial e logística — sempre com foco em análise de dados. Meu trabalho é tirar a informação da planilha esquecida e colocá-la onde ela decide.</p>
+      <p class="i18n"
+         data-pt="Gosto de automatizar o repetitivo: um script em Python, uma consulta bem escrita ou um Power Query que economiza horas por semana. Menos trabalho manual, mais tempo pensando no que importa."
+         data-en="I like automating the repetitive: a Python script, a well-written query or a Power Query flow that saves hours every week. Less manual work, more time thinking about what matters.">
+         Gosto de automatizar o repetitivo: um script em Python, uma consulta bem escrita ou um Power Query que economiza horas por semana. Menos trabalho manual, mais tempo pensando no que importa.</p>
+      <div class="stats">
+        <div class="stat"><div class="n">6+</div><div class="l i18n" data-pt="anos de disciplina militar" data-en="years of military discipline">anos de disciplina militar</div></div>
+        <div class="stat"><div class="n">5</div><div class="l i18n" data-pt="ferramentas no dia a dia" data-en="core daily tools">ferramentas no dia a dia</div></div>
+        <div class="stat"><div class="n">∞</div><div class="l i18n" data-pt="processos pra automatizar" data-en="processes left to automate">processos pra automatizar</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- EXPERTISE -->
+<section class="section wrap reveal" id="especialidade">
+  <span class="eyebrow i18n" data-pt="02 — Especialidade" data-en="02 — Expertise">02 — Especialidade</span>
+  <h2 class="title i18n" data-pt="Meu kit de ferramentas." data-en="My toolkit.">Meu kit de ferramentas.</h2>
+  <div class="cards" id="cards">
+    <div class="card"><span class="tag">01</span><div class="ico">📊</div>
+      <h3>Power BI</h3>
+      <p class="i18n" data-pt="Dashboards e modelagem star schema com DAX. Indicadores que contam uma história, não só mostram números." data-en="Dashboards and star-schema modeling with DAX. KPIs that tell a story, not just show numbers.">Dashboards e modelagem star schema com DAX. Indicadores que contam uma história, não só mostram números.</p></div>
+    <div class="card"><span class="tag">02</span><div class="ico">🧮</div>
+      <h3>Excel Avançado</h3>
+      <p class="i18n" data-pt="Fórmulas dinâmicas, funções de matriz e automação. A planilha como ferramenta de análise, não só de registro." data-en="Dynamic formulas, array functions and automation. The spreadsheet as an analysis tool, not just a ledger.">Fórmulas dinâmicas, funções de matriz e automação. A planilha como ferramenta de análise, não só de registro.</p></div>
+    <div class="card"><span class="tag">03</span><div class="ico">🔗</div>
+      <h3>Power Query (M)</h3>
+      <p class="i18n" data-pt="Limpeza e transformação de dados em fluxos repetíveis. Base bagunçada entra, tabela confiável sai." data-en="Data cleaning and transformation in repeatable flows. Messy source in, trustworthy table out.">Limpeza e transformação de dados em fluxos repetíveis. Base bagunçada entra, tabela confiável sai.</p></div>
+    <div class="card"><span class="tag">04</span><div class="ico">🗄️</div>
+      <h3>SQL</h3>
+      <p class="i18n" data-pt="Consultas analíticas e window functions. Vou direto na origem dos dados extrair exatamente o que a análise precisa." data-en="Analytical queries and window functions. Straight to the source to extract exactly what the analysis needs.">Consultas analíticas e window functions. Vou direto na origem dos dados extrair exatamente o que a análise precisa.</p></div>
+    <div class="card"><span class="tag">05</span><div class="ico">🐍</div>
+      <h3>Python</h3>
+      <p class="i18n" data-pt="Automação de rotinas com pandas e openpyxl. Scripts que processam arquivos, cruzam bases e monitoram erros sozinhos." data-en="Routine automation with pandas and openpyxl. Scripts that process files, join sources and monitor errors on their own.">Automação de rotinas com pandas e openpyxl. Scripts que processam arquivos, cruzam bases e monitoram erros sozinhos.</p></div>
+    <div class="card"><span class="tag">06</span><div class="ico">⚙️</div>
+      <h3 class="i18n" data-pt="Automação" data-en="Automation">Automação</h3>
+      <p class="i18n" data-pt="Batch, agendamentos e integrações. Ligo as pontas entre a rotina administrativa e o técnico pra tirar o manual do caminho." data-en="Batch jobs, scheduling and integrations. I connect the admin routine to the technical side to take the manual work off the path.">Batch, agendamentos e integrações. Ligo as pontas entre a rotina administrativa e o técnico pra tirar o manual do caminho.</p></div>
+  </div>
+</section>
+
+<!-- EXPERIENCE -->
+<section class="section wrap reveal" id="experiencia">
+  <span class="eyebrow i18n" data-pt="03 — Experiência" data-en="03 — Experience">03 — Experiência</span>
+  <h2 class="title i18n" data-pt="A trajetória, em ordem." data-en="The path, in order.">A trajetória, em ordem.</h2>
+  <div class="timeline">
+    <div class="tl-item">
+      <div class="tl-year">2025 — <span class="i18n" data-pt="hoje" data-en="now">hoje</span></div>
+      <div class="tl-body">
+        <h3 class="i18n" data-pt="Analista Administrativo" data-en="Administrative Analyst">Analista Administrativo</h3>
+        <div class="org">Dental Fênix · Blumenau/SC</div>
+        <p class="i18n" data-pt="Promovido em setembro de 2025. Atuo entre compras, comercial, logística e administrativo com forte foco em análise de dados — dashboards, relatórios e automações que sustentam a operação." data-en="Promoted in September 2025. Working across purchasing, sales, logistics and administration with a strong focus on data analysis — dashboards, reports and automations that keep operations running.">Promovido em setembro de 2025. Atuo entre compras, comercial, logística e administrativo com forte foco em análise de dados — dashboards, relatórios e automações que sustentam a operação.</p>
+      </div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-year">2017 — 2023</div>
+      <div class="tl-body">
+        <h3 class="i18n" data-pt="Exército Brasileiro" data-en="Brazilian Army">Exército Brasileiro</h3>
+        <div class="org i18n" data-pt="Serviço militar" data-en="Military service">Serviço militar</div>
+        <p class="i18n" data-pt="Seis anos de formação em disciplina, liderança e trabalho sob pressão. A base que hoje sustenta meu jeito metódico de tratar dados e processos." data-en="Six years shaped by discipline, leadership and working under pressure — the foundation of the methodical way I handle data and processes today.">Seis anos de formação em disciplina, liderança e trabalho sob pressão. A base que hoje sustenta meu jeito metódico de tratar dados e processos.</p>
+        <span class="medal">🎖️ <span class="i18n" data-pt="Honraria “Ao Mérito”" data-en="“Ao Mérito” honor">Honraria “Ao Mérito”</span></span>
+      </div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-year">2022</div>
+      <div class="tl-body">
+        <h3 class="i18n" data-pt="Base em desenvolvimento" data-en="Development foundation">Base em desenvolvimento</h3>
+        <div class="org i18n" data-pt="Formação técnica" data-en="Technical training">Formação técnica</div>
+        <p class="i18n" data-pt="Estudos em C#, Java, Lua, React e JavaScript. Não é meu dia a dia hoje, mas é o que me deu a mentalidade de resolver problema com código e automação." data-en="Studies in C#, Java, Lua, React and JavaScript. Not my daily work today, but the source of the mindset of solving problems with code and automation.">Estudos em C#, Java, Lua, React e JavaScript. Não é meu dia a dia hoje, mas é o que me deu a mentalidade de resolver problema com código e automação.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROJECTS -->
+<section class="section wrap reveal" id="projetos">
+  <span class="eyebrow i18n" data-pt="04 — Projetos" data-en="04 — Projects">04 — Projetos</span>
+  <h2 class="title i18n" data-pt="Coisas que eu construí." data-en="Things I've built.">Coisas que eu construí.</h2>
+  <div class="proj">
+    <div class="pcard">
+      <span class="pt i18n" data-pt="App web" data-en="Web app">App web</span>
+      <h3>DiffForge</h3>
+      <p class="i18n" data-pt="Ferramenta de comparação e mesclagem de texto com motor de diff (LCS), merge bidirecional e undo/redo, em visual de IDE." data-en="A text comparison and merge tool with an LCS diff engine, bidirectional merge and undo/redo, in a dark IDE look.">Ferramenta de comparação e mesclagem de texto com motor de diff (LCS), merge bidirecional e undo/redo, em visual de IDE.</p>
+      <div class="stack"><span>HTML</span><span>CSS</span><span>JavaScript</span></div>
+    </div>
+    <div class="pcard">
+      <span class="pt i18n" data-pt="Automação" data-en="Automation">Automação</span>
+      <h3 class="i18n" data-pt="Rotinas de dados" data-en="Data routines">Rotinas de dados</h3>
+      <p class="i18n" data-pt="Scripts em Python e Batch que processam logs em rede, monitoram erros de estoque e ajustam quantidades automaticamente." data-en="Python and Batch scripts that process network logs, watch for stock errors and adjust quantities automatically.">Scripts em Python e Batch que processam logs em rede, monitoram erros de estoque e ajustam quantidades automaticamente.</p>
+      <div class="stack"><span>Python</span><span>Batch</span><span>pandas</span></div>
+    </div>
+    <div class="pcard">
+      <span class="pt i18n" data-pt="Referência" data-en="Reference">Referência</span>
+      <h3 class="i18n" data-pt="Skill packages" data-en="Skill packages">Skill packages</h3>
+      <p class="i18n" data-pt="Pacotes de referência próprios para análise de dados e desenvolvimento — do array do Excel 365 ao DAX e às window functions em SQL." data-en="My own reference packages for data analysis and development — from Excel 365 arrays to DAX and SQL window functions.">Pacotes de referência próprios para análise de dados e desenvolvimento — do array do Excel 365 ao DAX e às window functions em SQL.</p>
+      <div class="stack"><span>Excel 365</span><span>Power BI</span><span>SQL</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<footer class="contact wrap reveal" id="contato">
+  <span class="eyebrow i18n" data-pt="05 — Contato" data-en="05 — Contact" style="justify-content:center">05 — Contato</span>
+  <h2 class="i18n" data-pt="Vamos transformar <span class='grad'>dados em decisão?</span>" data-en="Let's turn <span class='grad'>data into decisions?</span>">Vamos transformar <span class="grad">dados em decisão?</span></h2>
+  <p class="i18n" data-pt="Aberto a conversas sobre análise de dados, automação e projetos que precisam de um pouco de ordem. Me chama." data-en="Open to conversations about data analysis, automation and projects that could use a bit of order. Reach out.">Aberto a conversas sobre análise de dados, automação e projetos que precisam de um pouco de ordem. Me chama.</p>
+  <div class="cta-row">
+    <a class="btn btn-primary" href="mailto:pessoal.fec@gmail.com"><span class="i18n" data-pt="Enviar e-mail" data-en="Send email">Enviar e-mail</span></a>
+    <a class="btn btn-ghost" href="https://github.com/FelipeECorrea" target="_blank" rel="noopener">GitHub</a>
+    <a class="btn btn-ghost" href="https://www.linkedin.com/in/felipeecorrea/" target="_blank" rel="noopener">LinkedIn</a>
+  </div>
+  <div class="foot wrap">
+    <span>© <span id="yr"></span> Felipe Evanilson Corrêa</span>
+    <span class="i18n" data-pt="Feito com café e disciplina · Blumenau/SC" data-en="Built with coffee and discipline · Blumenau/SC">Feito com café e disciplina · Blumenau/SC</span>
+  </div>
+</footer>
+</main>
+
+<script>
+(function(){
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* nav shadow on scroll */
+  var nav = document.getElementById('nav');
+  addEventListener('scroll', function(){ nav.classList.toggle('scrolled', scrollY > 20); }, {passive:true});
+
+  /* year */
+  document.getElementById('yr').textContent = new Date().getFullYear();
+
+  /* language toggle */
+  var buttons = document.querySelectorAll('.lang button');
+  function setLang(lang){
+    document.documentElement.lang = lang === 'pt' ? 'pt-BR' : 'en';
+    document.querySelectorAll('.i18n').forEach(function(el){
+      var val = el.getAttribute('data-'+lang);
+      if(val != null){ el.innerHTML = val; }
+    });
+    buttons.forEach(function(b){ b.classList.toggle('on', b.dataset.lang === lang); });
+  }
+  buttons.forEach(function(b){ b.addEventListener('click', function(){ setLang(b.dataset.lang); }); });
+
+  /* avatar photo swap */
+  var photo = document.getElementById('avatarPhoto');
+  var inner = document.getElementById('avatarInner');
+  if(photo){ photo.addEventListener('load', function(){ inner.classList.add('has-photo'); }); }
+
+  /* reveal on scroll */
+  if('IntersectionObserver' in window && !reduce){
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); } });
+    }, {threshold:.12});
+    document.querySelectorAll('.reveal').forEach(function(el){ io.observe(el); });
+  } else {
+    document.querySelectorAll('.reveal').forEach(function(el){ el.classList.add('in'); });
+  }
+
+  if(reduce) return;
+
+  /* 3D tilt on avatar + glare + aurora parallax */
+  var stage = document.getElementById('avatarStage');
+  var card  = document.getElementById('avatarCard');
+  var glare = document.getElementById('glare');
+  if(stage && card){
+    stage.addEventListener('mousemove', function(e){
+      var r = stage.getBoundingClientRect();
+      var px = (e.clientX - r.left) / r.width  - .5;
+      var py = (e.clientY - r.top)  / r.height - .5;
+      card.style.transform = 'rotateY('+(px*18)+'deg) rotateX('+(-py*18)+'deg)';
+      glare.style.setProperty('--gx',(px*100+50)+'%');
+      glare.style.setProperty('--gy',(py*100+50)+'%');
+    });
+    stage.addEventListener('mouseleave', function(){ card.style.transform = ''; });
+  }
+
+  /* card spotlight follows cursor */
+  document.querySelectorAll('.card').forEach(function(c){
+    c.addEventListener('mousemove', function(e){
+      var r = c.getBoundingClientRect();
+      c.style.setProperty('--mx',(e.clientX-r.left)+'px');
+      c.style.setProperty('--my',(e.clientY-r.top)+'px');
+    });
+  });
+
+  /* subtle aurora parallax on pointer */
+  var blobs = document.querySelectorAll('.blob');
+  var tx = 0, ty = 0, cx = 0, cy = 0;
+  addEventListener('mousemove', function(e){
+    tx = (e.clientX / innerWidth  - .5);
+    ty = (e.clientY / innerHeight - .5);
+  });
+  (function loop(){
+    cx += (tx - cx) * .04; cy += (ty - cy) * .04;
+    blobs.forEach(function(b,i){
+      var d = (i+1) * 8;
+      b.style.marginLeft = (cx*d)+'px';
+      b.style.marginTop  = (cy*d)+'px';
+    });
+    requestAnimationFrame(loop);
+  })();
+})();
+</script>
+</body>
+</html>
